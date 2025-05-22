@@ -28,6 +28,55 @@ if uploaded_file is not None:
         st.subheader("Données brutes")
         st.dataframe(df.head(), use_container_width=True)
         
+        # Afficher le graphique des données brutes
+        st.subheader("Visualisation des données brutes")
+        fig_raw = go.Figure()
+        
+        # Ajouter la ligne des données brutes
+        fig_raw.add_trace(
+            go.Scatter(
+                x=df['CSN'] if 'CSN' in df.columns else df.index,
+                y=df['EGT Margin'],
+                mode='lines+markers',
+                name='EGT Margin',
+                line=dict(color='blue'),
+                marker=dict(size=4)
+            )
+        )
+        
+        # Ajouter les lignes de la zone critique
+        fig_raw.add_trace(
+            go.Scatter(
+                x=df['CSN'] if 'CSN' in df.columns else df.index,
+                y=[12] * len(df),
+                mode='lines',
+                name='Limite inférieure (12°C)',
+                line=dict(color='red', dash='dash')
+            )
+        )
+        
+        fig_raw.add_trace(
+            go.Scatter(
+                x=df['CSN'] if 'CSN' in df.columns else df.index,
+                y=[18] * len(df),
+                mode='lines',
+                name='Limite supérieure (18°C)',
+                line=dict(color='red', dash='dash')
+            )
+        )
+        
+        # Mise à jour du layout pour les données brutes
+        fig_raw.update_layout(
+            title="Données brutes EGT Margin",
+            xaxis_title="CSN",
+            yaxis_title="EGT Margin (°C)",
+            yaxis_range=[10, 50],
+            showlegend=True,
+            hovermode='x unified'
+        )
+        
+        st.plotly_chart(fig_raw, use_container_width=True)
+        
         # Bouton pour lancer la prédiction
         if st.button("Lancer la prédiction"):
             with st.spinner("Calcul des prédictions en cours..."):
